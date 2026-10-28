@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand: #003abd;
+    --brand-navy: #00226e;
+    --brand-dark: #0b2349;
+    --accent: #ff8c00;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white font-sans text-[18px] font-normal leading-[1.4] text-brand-navy antialiased;
+    background-image: url("/images/theme/BG.svg");
+    background-repeat: repeat;
+    background-position: 0 0;
+  }
+
+  @media (min-width: 1621px) {
+    body {
+      font-size: 20px;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    @apply transition-colors duration-300;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: rgba(255, 140, 0, 0.25);
+    color: var(--brand-navy);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .page-gradient-text {
+    background-image: linear-gradient(173.25deg, #003abd, #00226e);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .section-title {
+    @apply text-center text-[clamp(22px,2vw,30px)] font-bold uppercase leading-[1.2] tracking-[1.5px] text-brand-navy;
+  }
+
+  .slider-pattern {
+    background-color: #003abd;
+    background-image:
+      linear-gradient(rgba(0, 34, 110, 0.55), rgba(0, 34, 110, 0.55)),
+      url("/images/theme/BG5.svg");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .footer-pattern {
+    background-color: #003abd;
+    background-image: url("/images/theme/BG_footer.svg");
+    background-size: cover;
+    background-position: center;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded focus:bg-white focus:px-4 focus:py-3 focus:text-[16px] focus:font-semibold focus:text-brand focus:shadow-panel;
+  }
+}
+
+@layer utilities {
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
