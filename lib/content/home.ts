@@ -6,6 +6,26 @@ export interface AboutColumn {
   imageFirst: boolean;
 }
 
+export interface FounderProfile {
+  badge: string;
+  name: string;
+  role: string;
+  quote: string;
+  office: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  website: string;
+  cardImage: string;
+  portraitImage: string;
+}
+
+export interface AboutContent {
+  title: string;
+  columns: AboutColumn[];
+  founder: FounderProfile;
+}
+
 export interface HomeService {
   title: string[];
   icon: string;
@@ -22,7 +42,7 @@ export interface HomeContent {
     cta: string;
   };
   slider: { title: string; cta: string; slides: Slide[] };
-  about: { title: string; columns: AboutColumn[] };
+  about: AboutContent;
   services: {
     title: string;
     intro: string;
@@ -254,6 +274,20 @@ export const homeContent: Record<Locale, HomeContent> = {
           imageFirst: true,
         },
       ],
+      founder: {
+        badge: "LEADERSHIP & DIRECTION",
+        name: "Irvin Dulberg",
+        role: "Fondateur & Président du conseil d’administration",
+        quote:
+          "Depuis 19 ans, nous mettons l’excellence technologique, le talent de nos experts et une proximité sans faille au service de la performance et de l’innovation de nos clients au Luxembourg.",
+        office: "53 Boulevard Royal L-2449 Luxembourg",
+        phone: "+352 28 79 76 26",
+        whatsapp: "+352 661 11 22 60",
+        email: "irvin@advensystem.lu",
+        website: "www.advensystem.lu",
+        cardImage: "/images/team/irvin-dulberg-card.jpg",
+        portraitImage: "/images/team/irvin-dulberg.jpg",
+      },
     },
     services: {
       title: "NOS SERVICES & NOS DOMAINES D’ACTIVITÉ",
@@ -405,6 +439,20 @@ export const homeContent: Record<Locale, HomeContent> = {
           imageFirst: true,
         },
       ],
+      founder: {
+        badge: "LEADERSHIP & EXECUTIVE BOARD",
+        name: "Irvin Dulberg",
+        role: "Founder & Chairman of the Board",
+        quote:
+          "For 19 years, we have placed technological excellence, the talent of our experts, and close client relationships at the core of our clients’ success in Luxembourg.",
+        office: "53 Boulevard Royal L-2449 Luxembourg",
+        phone: "+352 28 79 76 26",
+        whatsapp: "+352 661 11 22 60",
+        email: "irvin@advensystem.lu",
+        website: "www.advensystem.lu",
+        cardImage: "/images/team/irvin-dulberg-card.jpg",
+        portraitImage: "/images/team/irvin-dulberg.jpg",
+      },
     },
     services: {
       title: "OUR SERVICES - FOR COMPANIES",

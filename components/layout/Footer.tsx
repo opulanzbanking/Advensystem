@@ -15,7 +15,7 @@ export function Footer({ locale }: { locale: Locale }) {
 
           <div className="mt-10 flex flex-col gap-10 text-center lg:mt-[49px] lg:flex-row lg:items-start lg:gap-0 lg:text-left">
             {/* Logo and brief */}
-            <div className="shrink-0 lg:mr-[40px] lg:mt-[10px] xl:mr-[60px]">
+            <div className="shrink-0 lg:mr-[30px] lg:mt-[10px] xl:mr-[45px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/theme/logo.svg"
@@ -37,40 +37,46 @@ export function Footer({ locale }: { locale: Locale }) {
               </a>
             </div>
 
-            {/* Addresses: Head office & Business center */}
-            <div className="text-[16px] leading-[1.5] lg:mr-[40px] lg:w-[260px] xl:mr-[60px] xl:w-[280px]">
+            {/* Addresses: Head office, Business center & Executive office */}
+            <div className="text-[15px] leading-[1.5] lg:mr-[30px] lg:w-[250px] xl:mr-[45px] xl:w-[270px]">
               <p className="font-bold text-white">
                 {company.legalName}
               </p>
               <div className="mt-2 text-white/90">
-                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+                <span className="block text-[12px] font-bold uppercase tracking-[1px] text-gold">
                   {isFr ? "Siège social :" : "Head office :"}
                 </span>
                 <span>{company.headOffice}</span>
               </div>
-              <div className="mt-3 text-white/90">
-                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+              <div className="mt-2.5 text-white/90">
+                <span className="block text-[12px] font-bold uppercase tracking-[1px] text-gold">
                   {isFr ? "Centre d'affaires :" : "Business center :"}
                 </span>
                 <span>{company.businessCenter}</span>
               </div>
+              <div className="mt-2.5 text-white/90">
+                <span className="block text-[12px] font-bold uppercase tracking-[1px] text-gold">
+                  {isFr ? "Direction / Bureau Luxembourg :" : "Executive office :"}
+                </span>
+                <span>{company.executiveOffice}</span>
+              </div>
             </div>
 
             {/* Legal / Licensing / Registration */}
-            <div className="text-[16px] leading-[1.5] lg:mr-[40px] lg:w-[260px] xl:mr-[60px] xl:w-[280px]">
+            <div className="text-[15px] leading-[1.5] lg:mr-[30px] lg:w-[230px] xl:mr-[45px] xl:w-[250px]">
               <div className="text-white/90">
-                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+                <span className="block text-[12px] font-bold uppercase tracking-[1px] text-gold">
                   {isFr ? "Autorisation d’établissement :" : "License number :"}
                 </span>
                 <span>{company.authorization}</span>
               </div>
               <div className="mt-3 text-white/90">
-                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+                <span className="block text-[12px] font-bold uppercase tracking-[1px] text-gold">
                   {isFr ? "Registre de commerce Luxembourg :" : "Register of commerce Luxembourg :"}
                 </span>
                 <span>{company.registry}</span>
               </div>
-              <div className="mt-3 text-[14px] text-white/70">
+              <div className="mt-3 text-[13px] text-white/70">
                 <p>
                   {isFr
                     ? "Service de portage salarial for professional companies"
@@ -80,8 +86,8 @@ export function Footer({ locale }: { locale: Locale }) {
             </div>
 
             {/* Direct contact and Socials */}
-            <div className="text-[16px] leading-[1.5]">
-              <div className="mb-2">
+            <div className="text-[15px] leading-[1.5]">
+              <div className="mb-2.5">
                 <div className="flex flex-col items-center gap-1 lg:items-start">
                   <a
                     href={company.phoneHref}
@@ -99,31 +105,41 @@ export function Footer({ locale }: { locale: Locale }) {
                   </a>
                   <a
                     href={company.phoneSecondaryHref}
-                    className="inline-flex items-center gap-2 pl-7 text-[15px] text-white/80 hover:text-gold"
+                    className="inline-flex items-center gap-2 pl-7 text-[14px] text-white/80 hover:text-gold"
                   >
                     {company.phoneSecondary}
                   </a>
                 </div>
               </div>
 
-              <div className="mb-4">
-                <a
-                  href={company.emailHref}
-                  className="inline-flex items-center gap-2 text-white hover:text-gold"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/images/theme/mailing.svg"
-                    alt=""
-                    width={20}
-                    height={20}
-                    className="h-5 w-5"
-                  />
-                  {company.email}
-                </a>
+              <div className="mb-3 space-y-1">
+                <div>
+                  <a
+                    href={company.emailHref}
+                    className="inline-flex items-center gap-2 text-white hover:text-gold"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/images/theme/mailing.svg"
+                      alt=""
+                      width={20}
+                      height={20}
+                      className="h-5 w-5"
+                    />
+                    {company.email}
+                  </a>
+                </div>
+                <div className="pl-7">
+                  <a
+                    href={company.founder.emailHref}
+                    className="text-[13px] text-white/80 hover:text-gold"
+                  >
+                    {company.founder.name} : {company.founder.email}
+                  </a>
+                </div>
               </div>
 
-              <div className="flex items-center justify-center gap-5 lg:justify-start lg:pl-7">
+              <div className="flex items-center justify-center gap-4 lg:justify-start lg:pl-7">
                 <a
                   href={company.whatsapp}
                   target="_blank"

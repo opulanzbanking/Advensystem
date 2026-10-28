@@ -4,16 +4,21 @@ A high-performance, accessible, responsive, and production-ready redevelopment o
 
 ---
 
-## 1. Company Information & 19 Years in Business
+## 1. Company Information & Leadership
 
 - **Company Name**: AdvenSystem SARL
 - **Years in Business**: 19 years of business (IT services business since 2007)
+- **Founder & Chairman of the Board**: Irvin Dulberg
+  - Direct Phone: +352 28 79 76 26
+  - Direct WhatsApp: +352 661 11 22 60
+  - Direct Email: [irvin@advensystem.lu](mailto:irvin@advensystem.lu)
+  - Executive Office: 53 Boulevard Royal L-2449 Luxembourg
 - **Head Office**: 49 Duarrefstrooss L-9964 Huldange Luxembourg
 - **Business Center**: 34 Grand rue L-9710 Clervaux Luxembourg
 - **License Number (Autorisation d’établissement)**: 10036042 / 0
 - **Register of Commerce Luxembourg (RCS)**: B176203
-- **Telephone**: +352 661 11 22 60
-- **Email**: [contact@advensystem.lu](mailto:contact@advensystem.lu)
+- **General Telephone**: +352 661 11 22 60
+- **General Email**: [contact@advensystem.lu](mailto:contact@advensystem.lu)
 - **Official Website**: [www.advensystem.lu](https://www.advensystem.lu)
 - **Socials**: [WhatsApp Direct Link](https://api.whatsapp.com/send?phone=352661112260) | [Facebook Page](https://www.facebook.com/AdvenSystem/)
 
@@ -36,9 +41,10 @@ AdvenSystem covers all technological expertise in IT:
 5. **Conduite du changement** (Change Management)
 6. **Expertise technique : Digital marketing, CRM, Blockchain, IA, BI & Analytics** (Technical Expertise: Digital Marketing, CRM, Blockchain, AI, BI & Analytics)
 
-### C. About the Company and Business
+### C. About the Company, Business & Founder Spotlight
 - **19 years of business** in IT consulting (activities began in 2007 with Groupe Renault in Paris, expanding to Europ Assistance, La Poste-Coliposte, La Mutuelle Générale, European Investment Bank, etc.).
 - **Made in Luxembourg**: Local Luxembourg employees ensuring immediate proximity, responsiveness, and attentive client collaboration.
+- **Founder Spotlight**: Dedicated executive profile card for **Irvin Dulberg** (Founder & Chairman of the Board) featuring his official business card, executive contact information, and leadership vision.
 
 ### D. Our Services — For Companies (Business Sectors)
 Aimed at major accounts, SMEs, and public institutions:

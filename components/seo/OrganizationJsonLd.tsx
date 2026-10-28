@@ -11,6 +11,14 @@ export function OrganizationJsonLd() {
     email: company.email,
     telephone: company.phone,
     sameAs: [company.facebook],
+    founder: {
+      "@type": "Person",
+      name: company.founder.name,
+      jobTitle: company.founder.role,
+      email: company.founder.email,
+      telephone: company.founder.phone,
+      image: `${siteUrl}${company.founder.cardImage}`,
+    },
     address: [
       {
         "@type": "PostalAddress",
@@ -27,6 +35,14 @@ export function OrganizationJsonLd() {
         addressLocality: "Clervaux",
         addressCountry: "LU",
         name: "Business center",
+      },
+      {
+        "@type": "PostalAddress",
+        streetAddress: "53 Boulevard Royal",
+        postalCode: "L-2449",
+        addressLocality: "Luxembourg",
+        addressCountry: "LU",
+        name: "Executive office",
       },
     ],
   };
