@@ -40,3 +40,12 @@ export interface PortageCard {
   text: string;
   tags?: string[];
 }
+
+export interface FeedbackItem {
+  author: string;
+  role: string;
+  company: string;
+  content: string;
+  rating: number;
+  sector: string;
+}

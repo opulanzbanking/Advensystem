@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Locale } from "@/types";
 import { homeContent } from "@/lib/content/home";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,29 @@ export function ServicesSection({ locale }: { locale: Locale }) {
         </div>
 
         <div className="xl:h-[141px]" aria-hidden="true" />
+
+        {/* Portage Salarial Feature Banner */}
+        <div className="mt-12 rounded-[6px] border border-brand/15 bg-gradient-to-r from-brand/5 via-brand/10 to-accent/10 p-6 text-left sm:p-8 lg:mt-16 lg:p-10">
+          <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+            <div className="max-w-[850px]">
+              <span className="inline-block rounded-[3px] bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-[1.5px] text-white">
+                {content.portageBanner.badge}
+              </span>
+              <h3 className="mt-3 text-[22px] font-bold text-brand-navy sm:text-[26px]">
+                {content.portageBanner.title}
+              </h3>
+              <p className="mt-2 text-[16px] leading-[1.6] text-brand-navy/85 sm:text-[18px]">
+                {content.portageBanner.text}
+              </p>
+            </div>
+            <Link
+              href={content.portageBanner.href}
+              className="inline-flex shrink-0 items-center justify-center rounded-[3px] bg-brand px-6 py-3.5 text-[16px] font-semibold text-white shadow-card transition hover:bg-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent"
+            >
+              {content.portageBanner.cta} →
+            </Link>
+          </div>
+        </div>
       </Container>
     </section>
   );

@@ -5,6 +5,7 @@ import { AboutSection } from "./AboutSection";
 import { ServicesSection } from "./ServicesSection";
 import { WhyUsSection } from "./WhyUsSection";
 import { ClientsSection } from "./ClientsSection";
+import { FeedbacksSection } from "./FeedbacksSection";
 
 export function HomePage({ locale }: { locale: Locale }) {
   return (
@@ -15,6 +16,7 @@ export function HomePage({ locale }: { locale: Locale }) {
       <ServicesSection locale={locale} />
       <WhyUsSection locale={locale} />
       <ClientsSection locale={locale} />
+      <FeedbacksSection locale={locale} />
     </>
   );
 }

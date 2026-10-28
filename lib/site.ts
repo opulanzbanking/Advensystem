@@ -16,18 +16,22 @@ export const routes = {
 export const company = {
   name: "AdvenSystem",
   legalName: "AdvenSystem SARL",
+  yearsInBusiness: 19,
+  businessType: "IT services business",
   phone: "+352 661 11 22 60",
   phoneHref: "tel:+352661112260",
   phoneSecondary: "+352 28 79 76 26",
   phoneSecondaryHref: "tel:+35228797626",
   email: "contact@advensystem.lu",
   emailHref: "mailto:contact@advensystem.lu",
+  website: "https://www.advensystem.lu",
+  websiteDisplay: "www.advensystem.lu",
   whatsapp: "https://api.whatsapp.com/send?phone=352661112260",
   facebook: "https://www.facebook.com/AdvenSystem/",
-  address: ["49 Duarrefstrooss L-9964 Huldange", "53 Boulevard Royal L-2449 Luxembourg"],
-  registry: "N° de registre de commerce : B176203",
-  authorization: "N° d’autorisation d’établissement : 10036042 / 0",
-  branch: "AdvenSystem SARL est la succursale d’Advensys Conseil LTD",
+  headOffice: "49 Duarrefstrooss L-9964 Huldange Luxembourg",
+  businessCenter: "34 Grand rue L-9710 Clervaux Luxembourg",
+  registry: "B176203",
+  authorization: "10036042 / 0",
 };
 
 export const navLabels: Record<Locale, { home: string; portage: string }> = {
@@ -62,6 +66,7 @@ export function navItems(locale: Locale): NavItem[] {
       { label: "Pourquoi nous", href: `${home}#whyus` },
       { label: "Portage Salarial", href: routes.portage.fr },
       { label: "Nos clients", href: `${home}#clients` },
+      { label: "Avis clients", href: `${home}#feedbacks` },
       { label: "Contact", href: `${home}#contacts` },
     ];
   }
@@ -72,6 +77,7 @@ export function navItems(locale: Locale): NavItem[] {
     { label: "Why us", href: `${home}#whyus` },
     { label: "Portage Salarial", href: routes.portage.en },
     { label: "Clients", href: `${home}#clients` },
+    { label: "Feedbacks", href: `${home}#feedbacks` },
     { label: "Contact", href: `${home}#contacts` },
   ];
 }

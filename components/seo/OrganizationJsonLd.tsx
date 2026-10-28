@@ -18,13 +18,15 @@ export function OrganizationJsonLd() {
         postalCode: "L-9964",
         addressLocality: "Huldange",
         addressCountry: "LU",
+        name: "Head office",
       },
       {
         "@type": "PostalAddress",
-        streetAddress: "53 Boulevard Royal",
-        postalCode: "L-2449",
-        addressLocality: "Luxembourg",
+        streetAddress: "34 Grand rue",
+        postalCode: "L-9710",
+        addressLocality: "Clervaux",
         addressCountry: "LU",
+        name: "Business center",
       },
     ],
   };

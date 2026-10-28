@@ -10,11 +10,12 @@ export function Footer({ locale }: { locale: Locale }) {
       <Container>
         <div className="pb-14 pt-16 lg:pb-[70px] lg:pt-[70px]">
           <h2 className="section-title text-white">
-            {isFr ? "Contact" : "Contact"}
+            {isFr ? "Contact & Informations" : "Contact & Information"}
           </h2>
 
           <div className="mt-10 flex flex-col gap-10 text-center lg:mt-[49px] lg:flex-row lg:items-start lg:gap-0 lg:text-left">
-            <div className="shrink-0 lg:mt-[22px] lg:pr-[30px] lg:mr-[60px] xl:mr-[107px]">
+            {/* Logo and brief */}
+            <div className="shrink-0 lg:mr-[40px] lg:mt-[10px] xl:mr-[60px]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/theme/logo.svg"
@@ -23,29 +24,63 @@ export function Footer({ locale }: { locale: Locale }) {
                 height={53}
                 className="mx-auto h-[40px] w-auto lg:mx-0"
               />
-            </div>
-
-            <div className="text-[17px] leading-[1.5] lg:mr-[70px] lg:w-[200px] xl:mr-[90px] xl:w-[156px]">
-              <p>
-                {company.legalName} ({isFr ? "succursale" : "branch"})
-                <br />
-                {company.address[0]}
-                <br />
-                {company.address[1]}
+              <p className="mt-2 text-[14px] font-medium tracking-[0.5px] text-white/80">
+                {isFr ? "19 ans d’activité • Services IT" : "19 years of business • IT services"}
               </p>
+              <a
+                href={company.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 block text-[14px] text-gold hover:underline"
+              >
+                {company.websiteDisplay}
+              </a>
             </div>
 
-            <div className="text-[17px] leading-[1.5] lg:mr-[70px] lg:w-[380px] xl:mr-[90px]">
-              <p>{company.registry}</p>
-              <p>{company.authorization}</p>
-              <p>
-                {isFr
-                  ? company.branch
-                  : "AdvenSystem SARL is the branch of Advensys Conseil LTD"}
+            {/* Addresses: Head office & Business center */}
+            <div className="text-[16px] leading-[1.5] lg:mr-[40px] lg:w-[260px] xl:mr-[60px] xl:w-[280px]">
+              <p className="font-bold text-white">
+                {company.legalName}
               </p>
+              <div className="mt-2 text-white/90">
+                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+                  {isFr ? "Siège social :" : "Head office :"}
+                </span>
+                <span>{company.headOffice}</span>
+              </div>
+              <div className="mt-3 text-white/90">
+                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+                  {isFr ? "Centre d'affaires :" : "Business center :"}
+                </span>
+                <span>{company.businessCenter}</span>
+              </div>
             </div>
 
-            <div className="text-[17px] leading-[1.5]">
+            {/* Legal / Licensing / Registration */}
+            <div className="text-[16px] leading-[1.5] lg:mr-[40px] lg:w-[260px] xl:mr-[60px] xl:w-[280px]">
+              <div className="text-white/90">
+                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+                  {isFr ? "Autorisation d’établissement :" : "License number :"}
+                </span>
+                <span>{company.authorization}</span>
+              </div>
+              <div className="mt-3 text-white/90">
+                <span className="block text-[13px] font-bold uppercase tracking-[1px] text-gold">
+                  {isFr ? "Registre de commerce Luxembourg :" : "Register of commerce Luxembourg :"}
+                </span>
+                <span>{company.registry}</span>
+              </div>
+              <div className="mt-3 text-[14px] text-white/70">
+                <p>
+                  {isFr
+                    ? "Service de portage salarial for professional companies"
+                    : "Wage portage service for professional companies"}
+                </p>
+              </div>
+            </div>
+
+            {/* Direct contact and Socials */}
+            <div className="text-[16px] leading-[1.5]">
               <div className="mb-2">
                 <div className="flex flex-col items-center gap-1 lg:items-start">
                   <a
@@ -64,12 +99,13 @@ export function Footer({ locale }: { locale: Locale }) {
                   </a>
                   <a
                     href={company.phoneSecondaryHref}
-                    className="inline-flex items-center gap-2 pl-7 text-white hover:text-gold"
+                    className="inline-flex items-center gap-2 pl-7 text-[15px] text-white/80 hover:text-gold"
                   >
                     {company.phoneSecondary}
                   </a>
                 </div>
               </div>
+
               <div className="mb-4">
                 <a
                   href={company.emailHref}
@@ -86,42 +122,46 @@ export function Footer({ locale }: { locale: Locale }) {
                   {company.email}
                 </a>
               </div>
-              <div className="flex items-center justify-center gap-6 lg:justify-start lg:pl-7">
+
+              <div className="flex items-center justify-center gap-5 lg:justify-start lg:pl-7">
                 <a
                   href={company.whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="WhatsApp"
-                  className="block h-[25px] w-[25px] transition hover:opacity-75"
+                  className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-[13px] text-white transition hover:bg-white/20"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/theme/WhatsApp-white.svg"
                     alt=""
-                    width={25}
-                    height={25}
-                    className="h-full w-full"
+                    width={20}
+                    height={20}
+                    className="h-5 w-5"
                   />
+                  <span>WhatsApp</span>
                 </a>
                 <a
                   href={company.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
-                  className="block h-[25px] w-[25px] transition hover:opacity-75"
+                  className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-[13px] text-white transition hover:bg-white/20"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/images/theme/Facebook-white.svg"
                     alt=""
-                    width={25}
-                    height={25}
-                    className="h-full w-full"
+                    width={20}
+                    height={20}
+                    className="h-5 w-5"
                   />
+                  <span>Facebook</span>
                 </a>
               </div>
             </div>
 
+            {/* Back to top */}
             <a
               href="#top"
               aria-label={isFr ? "Revenir en haut" : "Back to top"}
