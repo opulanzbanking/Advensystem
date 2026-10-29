@@ -15,9 +15,7 @@ export function OrganizationJsonLd() {
       "@type": "Person",
       name: company.founder.name,
       jobTitle: company.founder.role,
-      email: company.founder.email,
       telephone: company.founder.phone,
-      image: `${siteUrl}${company.founder.cardImage}`,
     },
     address: [
       {

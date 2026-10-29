@@ -79,7 +79,7 @@ export function Footer({ locale }: { locale: Locale }) {
               <div className="mt-3 text-[13px] text-white/70">
                 <p>
                   {isFr
-                    ? "Service de portage salarial for professional companies"
+                    ? "Service de portage salarial"
                     : "Wage portage service for professional companies"}
                 </p>
               </div>
@@ -127,14 +127,6 @@ export function Footer({ locale }: { locale: Locale }) {
                       className="h-5 w-5"
                     />
                     {company.email}
-                  </a>
-                </div>
-                <div className="pl-7">
-                  <a
-                    href={company.founder.emailHref}
-                    className="text-[13px] text-white/80 hover:text-gold"
-                  >
-                    {company.founder.name} : {company.founder.email}
                   </a>
                 </div>
               </div>

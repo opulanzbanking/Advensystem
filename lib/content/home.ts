@@ -16,14 +16,12 @@ export interface FounderProfile {
   whatsapp: string;
   email: string;
   website: string;
-  cardImage: string;
-  portraitImage: string;
 }
 
 export interface AboutContent {
   title: string;
   columns: AboutColumn[];
-  founder: FounderProfile;
+  founder?: FounderProfile;
 }
 
 export interface HomeService {
@@ -62,7 +60,7 @@ export interface HomeContent {
     cta: string;
   };
   clients: { title: string; intro: string };
-  feedbacks: {
+  feedbacks?: {
     title: string;
     intro: string;
     badge: string;
@@ -283,10 +281,8 @@ export const homeContent: Record<Locale, HomeContent> = {
         office: "53 Boulevard Royal L-2449 Luxembourg",
         phone: "+352 28 79 76 26",
         whatsapp: "+352 661 11 22 60",
-        email: "irvin@advensystem.lu",
+        email: "contact@advensystem.lu",
         website: "www.advensystem.lu",
-        cardImage: "/images/team/irvin-dulberg-card.jpg",
-        portraitImage: "/images/team/irvin-dulberg.jpg",
       },
     },
     services: {
@@ -307,7 +303,7 @@ export const homeContent: Record<Locale, HomeContent> = {
       ],
       portageBanner: {
         badge: "SERVICE DÉDIÉ AUX ENTREPRISES & CONSULTANTS",
-        title: "Service de portage salarial for professional companies",
+        title: "Service de portage salarial",
         text: "AdvenSystem propose une solution clé en main de portage salarial au Luxembourg : autonomie professionnelle, couverture sociale complète et conformité légale totale (CNS, CCSS, ITM).",
         cta: "Découvrir notre offre de portage",
         href: "/portage-salarial-luxembourg/",
@@ -448,10 +444,8 @@ export const homeContent: Record<Locale, HomeContent> = {
         office: "53 Boulevard Royal L-2449 Luxembourg",
         phone: "+352 28 79 76 26",
         whatsapp: "+352 661 11 22 60",
-        email: "irvin@advensystem.lu",
+        email: "contact@advensystem.lu",
         website: "www.advensystem.lu",
-        cardImage: "/images/team/irvin-dulberg-card.jpg",
-        portraitImage: "/images/team/irvin-dulberg.jpg",
       },
     },
     services: {

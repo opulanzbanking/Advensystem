@@ -11,7 +11,6 @@ A high-performance, accessible, responsive, and production-ready redevelopment o
 - **Founder & Chairman of the Board**: Irvin Dulberg
   - Direct Phone: +352 28 79 76 26
   - Direct WhatsApp: +352 661 11 22 60
-  - Direct Email: [irvin@advensystem.lu](mailto:irvin@advensystem.lu)
   - Executive Office: 53 Boulevard Royal L-2449 Luxembourg
 - **Head Office**: 49 Duarrefstrooss L-9964 Huldange Luxembourg
 - **Business Center**: 34 Grand rue L-9710 Clervaux Luxembourg
@@ -41,10 +40,9 @@ AdvenSystem covers all technological expertise in IT:
 5. **Conduite du changement** (Change Management)
 6. **Expertise technique : Digital marketing, CRM, Blockchain, IA, BI & Analytics** (Technical Expertise: Digital Marketing, CRM, Blockchain, AI, BI & Analytics)
 
-### C. About the Company, Business & Founder Spotlight
+### C. About the Company & Business
 - **19 years of business** in IT consulting (activities began in 2007 with Groupe Renault in Paris, expanding to Europ Assistance, La Poste-Coliposte, La Mutuelle Générale, European Investment Bank, etc.).
 - **Made in Luxembourg**: Local Luxembourg employees ensuring immediate proximity, responsiveness, and attentive client collaboration.
-- **Founder Spotlight**: Dedicated executive profile card for **Irvin Dulberg** (Founder & Chairman of the Board) featuring his official business card, executive contact information, and leadership vision.
 
 ### D. Our Services — For Companies (Business Sectors)
 Aimed at major accounts, SMEs, and public institutions:
@@ -55,7 +53,7 @@ Aimed at major accounts, SMEs, and public institutions:
 5. Sécurité informatique (IT Security)
 6. Application mobile (Mobile Apps)
 7. Création de site internet (e-commerce) (Website Creation)
-- **Dedicated Portage Salarial Callout**: *Service de portage salarial for professional companies* (turnkey umbrella company solutions in Luxembourg).
+- **Dedicated Portage Salarial Callout**: *Service de portage salarial* (turnkey umbrella company solutions in Luxembourg).
 
 ### E. Why Choose Us? (Nos Projets)
 - Modular and scalable engagement model delivering high performance and innovation with close customer relations.
@@ -70,10 +68,7 @@ Aimed at major accounts, SMEs, and public institutions:
 - **Target Sectors**: PME, Banques, Industrie, Compagnies d'assurance et Grands groupes
 - **Reference Logos**: SNCF, Renault, APSIDE, La Mutuelle Générale, Europ Assistance, Valente Carrelages, Eurocontrol, La Poste, European Investment Bank, PARVA Consulting, Datapy, L’Oréal, Takeda.
 
-### G. Feedbacks & Avis Clients
-Dedicated testimonials section highlighting verified feedback from Banking & Insurance, Automotive Industry, Wage Portage, and Logistics clients in Luxembourg with 5-star ratings.
-
-### H. Wage Portage in Luxembourg (`/portage-salarial-luxembourg/` & `/en/portage-salarial-luxembourg-2/`)
+### G. Wage Portage in Luxembourg (`/portage-salarial-luxembourg/` & `/en/portage-salarial-luxembourg-2/`)
 Complete standalone portal covering autonomy, employee status, 100% legal compliance (CNS, CCSS, ITM), transparent social charges, and income simulation requests.
 
 ---

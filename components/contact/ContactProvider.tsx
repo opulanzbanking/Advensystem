@@ -5,12 +5,10 @@ import {
   useCallback,
   useContext,
   useMemo,
-  useState,
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
 import { localeFromPath } from "@/lib/site";
-import { ContactModal } from "./ContactModal";
 
 interface ContactContextValue {
   openContact: (source?: string) => void;
@@ -29,31 +27,38 @@ export function useContact(): ContactContextValue {
 export function ContactProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? "/";
   const locale = localeFromPath(pathname);
-  const [isOpen, setIsOpen] = useState(false);
-  const [source, setSource] = useState("AdvenSystem.lu");
 
   const openContact = useCallback(
-    (nextSource?: string) => {
-      setSource(nextSource ?? pathname);
-      setIsOpen(true);
-    },
-    [pathname],
-  );
+    () => {
+      if (typeof window === "undefined") return;
 
-  const closeContact = useCallback(() => setIsOpen(false), []);
+      const contactSection = document.getElementById("contacts");
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (window.history?.pushState) {
+          window.history.pushState(null, "", "#contacts");
+        }
+        const input = contactSection.querySelector<HTMLInputElement>(
+          "#contact-name, input:not([type='hidden']), textarea",
+        );
+        if (input) {
+          setTimeout(() => {
+            input.focus({ preventScroll: true });
+          }, 450);
+        }
+      } else {
+        const target = locale === "en" ? "/en/#contacts" : "/#contacts";
+        window.location.href = target;
+      }
+    },
+    [locale],
+  );
 
   const value = useMemo(() => ({ openContact }), [openContact]);
 
   return (
     <ContactContext.Provider value={value}>
       {children}
-      {isOpen ? (
-        <ContactModal
-          locale={locale}
-          source={source}
-          onClose={closeContact}
-        />
-      ) : null}
     </ContactContext.Provider>
   );
 }

@@ -26,12 +26,8 @@ export const company = {
     phoneHref: "tel:+35228797626",
     whatsapp: "+352 661 11 22 60",
     whatsappHref: "https://api.whatsapp.com/send?phone=352661112260",
-    email: "irvin@advensystem.lu",
-    emailHref: "mailto:irvin@advensystem.lu",
     website: "www.advensystem.lu",
     office: "53 Boulevard Royal L-2449 Luxembourg",
-    cardImage: "/images/team/irvin-dulberg-card.jpg",
-    portraitImage: "/images/team/irvin-dulberg.jpg",
   },
   phone: "+352 661 11 22 60",
   phoneHref: "tel:+352661112260",
@@ -82,7 +78,6 @@ export function navItems(locale: Locale): NavItem[] {
       { label: "Pourquoi nous", href: `${home}#whyus` },
       { label: "Portage Salarial", href: routes.portage.fr },
       { label: "Nos clients", href: `${home}#clients` },
-      { label: "Avis clients", href: `${home}#feedbacks` },
       { label: "Contact", href: `${home}#contacts` },
     ];
   }
@@ -93,7 +88,6 @@ export function navItems(locale: Locale): NavItem[] {
     { label: "Why us", href: `${home}#whyus` },
     { label: "Portage Salarial", href: routes.portage.en },
     { label: "Clients", href: `${home}#clients` },
-    { label: "Feedbacks", href: `${home}#feedbacks` },
     { label: "Contact", href: `${home}#contacts` },
   ];
 }
