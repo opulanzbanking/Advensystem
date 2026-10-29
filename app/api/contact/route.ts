@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { saveLead, updateLeadEmailStatus } from "@/lib/db/leads";
 
 export const runtime = "nodejs";
 
@@ -101,9 +102,9 @@ export async function POST(request: Request) {
   const source = asString(payload.source).slice(0, 200) || "AdvenSystem.lu";
 
   const errors: string[] = [];
-  if (name.length < 1 || name.length > 20) errors.push("name");
-  if (surname.length < 1 || surname.length > 20) errors.push("surname");
-  if (!PHONE_RE.test(phone) || phone.length > 22) errors.push("phone");
+  if (name.length < 1 || name.length > 30) errors.push("name");
+  if (surname.length < 1 || surname.length > 30) errors.push("surname");
+  if (!PHONE_RE.test(phone) || phone.length > 25) errors.push("phone");
   if (!EMAIL_RE.test(mail) || mail.length > 254) errors.push("mail");
   if (companyname.length > 80) errors.push("companyname");
   if (msg.length < 2 || msg.length > 4000) errors.push("msg");
@@ -124,6 +125,21 @@ export async function POST(request: Request) {
     );
   }
 
+  // 1. Immediately persist lead to database storage (leads.json & leads.csv)
+  const stored = await saveLead({
+    name,
+    surname,
+    phone,
+    mail,
+    companyname,
+    msg,
+    locale,
+    source,
+    ip,
+    emailSent: false,
+  });
+
+  // 2. If SMTP is configured, send the notification email
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
@@ -132,80 +148,80 @@ export async function POST(request: Request) {
   const from = process.env.SMTP_FROM || user;
   const to = process.env.CONTACT_TO || "contact@advensystem.lu";
 
-  if (!host || !user || !pass || !from) {
-    return NextResponse.json(
-      {
-        ok: false,
-        code: "not_configured",
-        message:
-          locale === "en"
-            ? "The contact form is not connected to a mail service yet."
-            : "Le formulaire de contact n’est pas encore connecté à une messagerie.",
-      },
-      { status: 503 },
+  if (host && user && pass && from) {
+    const subject =
+      locale === "en"
+        ? `Website lead – ${singleLine(name)} ${singleLine(surname)}`
+        : `Nouveau contact site web – ${singleLine(name)} ${singleLine(surname)}`;
+
+    const text = [
+      `Nom: ${name} ${surname}`,
+      `E-mail: ${mail}`,
+      `Téléphone: ${phone}`,
+      `Société: ${companyname || "—"}`,
+      `Langue: ${locale.toUpperCase()}`,
+      `Source: ${source}`,
+      `ID Lead: ${stored.id}`,
+      "",
+      "Message:",
+      msg,
+    ].join("\n");
+
+    const html = `
+      <h2 style="font-family:Arial,sans-serif;color:#00226E;margin:0 0 16px">Nouveau contact reçu depuis le site</h2>
+      <table style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;border-collapse:collapse">
+        <tr><td style="padding:4px 12px 4px 0"><strong>Nom</strong></td><td>${escapeHtml(name)} ${escapeHtml(surname)}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>E-mail</strong></td><td><a href="mailto:${escapeHtml(mail)}">${escapeHtml(mail)}</a></td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Téléphone</strong></td><td><a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Société</strong></td><td>${escapeHtml(companyname || "—")}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Langue</strong></td><td>${escapeHtml(locale.toUpperCase())}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Source</strong></td><td>${escapeHtml(source)}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>ID Suivi</strong></td><td><code>${escapeHtml(stored.id)}</code></td></tr>
+      </table>
+      <div style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;margin-top:20px;padding:12px;background:#f5f7fc;border-left:4px solid #003ABD">
+        <strong>Message :</strong>
+        <p style="white-space:pre-wrap;margin-top:8px">${escapeHtml(msg)}</p>
+      </div>
+    `;
+
+    try {
+      const transporter = nodemailer.createTransport({
+        host,
+        port: Number.isFinite(port) ? port : 587,
+        secure,
+        auth: { user, pass },
+      });
+
+      await transporter.sendMail({
+        from,
+        to,
+        replyTo: mail,
+        subject,
+        text,
+        html,
+      });
+
+      updateLeadEmailStatus(stored.id, true);
+    } catch (error) {
+      console.error("[contact] Failed to deliver notification email (lead is safely saved)", error);
+      updateLeadEmailStatus(
+        stored.id,
+        false,
+        error instanceof Error ? error.message : String(error),
+      );
+    }
+  } else {
+    console.info(
+      `[contact] SMTP not configured. Lead ${stored.id} safely stored in database (data/leads.json & data/leads.csv).`,
     );
   }
 
-  const subject =
-    locale === "en"
-      ? `Website contact – ${singleLine(name)} ${singleLine(surname)}`
-      : `Contact site web – ${singleLine(name)} ${singleLine(surname)}`;
-
-  const text = [
-    `Name: ${name} ${surname}`,
-    `E-mail: ${mail}`,
-    `Phone: ${phone}`,
-    `Company: ${companyname || "—"}`,
-    `Language: ${locale.toUpperCase()}`,
-    `Source: ${source}`,
-    "",
-    "Message:",
-    msg,
-  ].join("\n");
-
-  const html = `
-    <h2 style="font-family:Arial,sans-serif;color:#00226E;margin:0 0 16px">New contact request</h2>
-    <table style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;border-collapse:collapse">
-      <tr><td style="padding:4px 12px 4px 0"><strong>Name</strong></td><td>${escapeHtml(name)} ${escapeHtml(surname)}</td></tr>
-      <tr><td style="padding:4px 12px 4px 0"><strong>E-mail</strong></td><td>${escapeHtml(mail)}</td></tr>
-      <tr><td style="padding:4px 12px 4px 0"><strong>Phone</strong></td><td>${escapeHtml(phone)}</td></tr>
-      <tr><td style="padding:4px 12px 4px 0"><strong>Company</strong></td><td>${escapeHtml(companyname || "—")}</td></tr>
-      <tr><td style="padding:4px 12px 4px 0"><strong>Language</strong></td><td>${escapeHtml(locale.toUpperCase())}</td></tr>
-      <tr><td style="padding:4px 12px 4px 0"><strong>Source</strong></td><td>${escapeHtml(source)}</td></tr>
-    </table>
-    <p style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;white-space:pre-wrap;margin-top:20px">${escapeHtml(msg)}</p>
-  `;
-
-  try {
-    const transporter = nodemailer.createTransport({
-      host,
-      port: Number.isFinite(port) ? port : 587,
-      secure,
-      auth: { user, pass },
-    });
-
-    await transporter.sendMail({
-      from,
-      to,
-      replyTo: mail,
-      subject,
-      text,
-      html,
-    });
-
-    return NextResponse.json({ ok: true });
-  } catch (error) {
-    console.error("[contact] Failed to send contact e-mail", error);
-    return NextResponse.json(
-      {
-        ok: false,
-        code: "send_failed",
-        message:
-          locale === "en"
-            ? "The message could not be delivered."
-            : "Le message n’a pas pu être délivré.",
-      },
-      { status: 502 },
-    );
-  }
+  return NextResponse.json({
+    ok: true,
+    id: stored.id,
+    message:
+      locale === "en"
+        ? "The request was sent successfully. We will contact you soon, thank you!"
+        : "La demande a été envoyée avec succès. Nous prendrons contact avec vous bientôt, merci !",
+  });
 }

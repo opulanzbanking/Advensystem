@@ -6,7 +6,7 @@ export function Footer({ locale }: { locale: Locale }) {
   const isFr = locale === "fr";
 
   return (
-    <footer id="contacts" className="footer-pattern text-white shadow-panel">
+    <footer id="footer" className="footer-pattern text-white shadow-panel">
       <Container>
         <div className="pb-14 pt-16 lg:pb-[70px] lg:pt-[70px]">
           <h2 className="section-title text-white">
