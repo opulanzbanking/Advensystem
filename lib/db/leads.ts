@@ -16,7 +16,7 @@ export interface StoredLead {
   ip: string;
   emailSent: boolean;
   emailError?: string;
-  storageTarget?: "primary" | "fallback" | "memory";
+  storageTarget?: "github" | "primary" | "fallback" | "memory";
 }
 
 // In-memory cache ensures no lead is ever lost even if filesystem is read-only (e.g. Vercel)
@@ -66,6 +66,91 @@ function buildCsvRow(lead: StoredLead): string {
 
 const CSV_HEADER = "\uFEFFDate,Nom,Prénom,Email,Téléphone,Société,Langue,Source,Message\n";
 
+// GitHub storage: each lead is committed to a CSV file in a PRIVATE repository.
+// Never point this at the public website repository, the file contains personal data.
+// LEADS_GITHUB_TOKEN needs "Contents: read and write" on LEADS_GITHUB_REPO only.
+interface GitHubConfig {
+  token: string;
+  repo: string;
+  branch: string;
+  filePath: string;
+}
+
+function getGitHubConfig(): GitHubConfig | null {
+  const token = process.env.LEADS_GITHUB_TOKEN;
+  const repo = process.env.LEADS_GITHUB_REPO;
+  if (!token || !repo) return null;
+  return {
+    token,
+    repo,
+    branch: process.env.LEADS_GITHUB_BRANCH || "main",
+    filePath: process.env.LEADS_GITHUB_PATH || "leads.csv",
+  };
+}
+
+function githubContentsUrl(config: GitHubConfig): string {
+  return `https://api.github.com/repos/${config.repo}/contents/${config.filePath}`;
+}
+
+function githubHeaders(config: GitHubConfig): HeadersInit {
+  return {
+    Authorization: `Bearer ${config.token}`,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "advensystem-leads",
+  };
+}
+
+async function readGitHubCsv(
+  config: GitHubConfig,
+): Promise<{ content: string; sha?: string }> {
+  const res = await fetch(
+    `${githubContentsUrl(config)}?ref=${encodeURIComponent(config.branch)}`,
+    { headers: githubHeaders(config), cache: "no-store" },
+  );
+  if (res.status === 404) return { content: "" };
+  if (!res.ok) throw new Error(`GitHub read failed: ${res.status}`);
+  const file = (await res.json()) as { content: string; sha: string };
+  return {
+    content: Buffer.from(file.content, "base64").toString("utf8"),
+    sha: file.sha,
+  };
+}
+
+async function appendLeadToGitHub(
+  config: GitHubConfig,
+  lead: StoredLead,
+): Promise<void> {
+  // Retry when another submission committed in between (sha mismatch).
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const { content, sha } = await readGitHubCsv(config);
+    const next = (content || CSV_HEADER) + buildCsvRow(lead);
+    const res = await fetch(githubContentsUrl(config), {
+      method: "PUT",
+      headers: githubHeaders(config),
+      body: JSON.stringify({
+        message: `lead: ${lead.createdAt} (${lead.locale.toUpperCase()})`,
+        content: Buffer.from(next, "utf8").toString("base64"),
+        branch: config.branch,
+        ...(sha ? { sha } : {}),
+      }),
+    });
+    if (res.ok) return;
+    if (res.status !== 409 && res.status !== 422) {
+      throw new Error(`GitHub write failed: ${res.status} ${await res.text()}`);
+    }
+    await new Promise((r) => setTimeout(r, 250 * (attempt + 1)));
+  }
+  throw new Error("GitHub write failed: too many concurrent updates");
+}
+
+export async function getGitHubLeadsCsv(): Promise<string | null> {
+  const config = getGitHubConfig();
+  if (!config) return null;
+  const { content } = await readGitHubCsv(config);
+  return content || null;
+}
+
 export async function saveLead(
   leadData: Omit<StoredLead, "id" | "createdAt">,
 ): Promise<StoredLead> {
@@ -81,6 +166,21 @@ export async function saveLead(
 
   // Always keep in memory so it's instantly retrievable
   memoryLeads.unshift(newLead);
+
+  // Attempt 0: commit to the private GitHub leads repository (durable on Vercel)
+  const github = getGitHubConfig();
+  if (github) {
+    try {
+      await appendLeadToGitHub(github, newLead);
+      newLead.storageTarget = "github";
+      return newLead;
+    } catch (githubErr) {
+      console.error(
+        "[leads] GitHub write failed, falling back to local storage.",
+        githubErr instanceof Error ? githubErr.message : githubErr,
+      );
+    }
+  }
 
   // Attempt 1: Save to primary workspace directory (leads.json & leads.csv)
   let savedToDisk = false;

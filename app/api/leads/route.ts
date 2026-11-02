@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getAllLeads, getLeadsCsv } from "@/lib/db/leads";
+import { getAllLeads, getGitHubLeadsCsv, getLeadsCsv } from "@/lib/db/leads";
 
 export const runtime = "nodejs";
 
@@ -8,14 +8,20 @@ export async function GET(request: Request) {
   const format = searchParams.get("format");
   const key = searchParams.get("key");
 
-  // Optional security token check
+  // Leads contain personal data: closed unless LEADS_SECRET is set and matches.
   const secret = process.env.LEADS_SECRET;
-  if (secret && key !== secret) {
+  if (!secret || key !== secret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   if (format === "csv") {
-    const csv = getLeadsCsv();
+    let csv: string | null = null;
+    try {
+      csv = await getGitHubLeadsCsv();
+    } catch (error) {
+      console.error("[leads] Could not read leads from GitHub", error);
+    }
+    csv ??= getLeadsCsv();
     if (!csv) {
       return new NextResponse(
         "Date,Nom,Prénom,Email,Téléphone,Société,Langue,Source,Message\n",

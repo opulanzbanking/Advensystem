@@ -82,6 +82,7 @@ Complete standalone portal covering autonomy, employee status, 100% legal compli
 | `https://advensystem.lu/portage-salarial-luxembourg/` | `app/(fr)/portage-salarial-luxembourg/page.tsx` | French | HTTP 200 Static |
 | `https://advensystem.lu/en/portage-salarial-luxembourg-2/` | `app/(en)/en/portage-salarial-luxembourg-2/page.tsx` | English | HTTP 200 Static |
 | `/api/contact/` | `app/api/contact/route.ts` | Shared | HTTP 200 Dynamic |
+| `/api/leads/` | `app/api/leads/route.ts` | Shared | Dynamic, requires `?key=LEADS_SECRET` |
 | `/sitemap.xml` | `app/sitemap.ts` | Shared | HTTP 200 Static |
 | `/robots.txt` | `app/robots.ts` | Shared | HTTP 200 Static |
 | `/opengraph-image` | `app/opengraph-image.tsx` | Shared | HTTP 200 Static |
@@ -107,3 +108,14 @@ npm run build
 # Start production server
 npm run start
 ```
+
+---
+
+## 5. Contact Form, Leads and E-mail
+
+Every submission of the contact form (`app/api/contact/route.ts`) is stored as a lead and, when SMTP is configured, e-mailed to `CONTACT_TO` (contact@advensystem.lu). Set the variables from `.env.example` in Vercel (Project Settings, Environment Variables) and redeploy.
+
+- **Leads in git**: with `LEADS_GITHUB_TOKEN` and `LEADS_GITHUB_REPO` set, each lead is appended to `leads.csv` in that repository as a commit. The repository must be private because the file contains names, e-mails and phone numbers; this website repository is public, so it is never used for leads. Use a fine-grained token restricted to the leads repository with "Contents: read and write".
+- **Fallback**: without GitHub settings (or if GitHub is unreachable), leads go to `data/` locally or to `/tmp` on Vercel, which is temporary and is wiped on restarts.
+- **E-mail**: advensystem.lu mail is hosted by OVH, so use `ssl0.ovh.net`, port 465, `SMTP_SECURE=true`, and the contact@advensystem.lu mailbox credentials.
+- **Export**: `/api/leads?key=<LEADS_SECRET>&format=csv` downloads all leads. The endpoint returns 401 when `LEADS_SECRET` is not set.
