@@ -17,10 +17,13 @@ const copy = {
     subtitle:
       "Une question, un projet IT ou un besoin en portage salarial ? Nos experts locaux au Luxembourg vous répondent sous 24h ouvrées.",
     name: "Nom*",
+    namePlaceholder: "Dupont",
     surname: "Prénom*",
+    surnamePlaceholder: "Jean",
     phone: "Numéro de téléphone*",
     mail: "E-mail*",
     companyname: "Nom de la société",
+    companyPlaceholder: "Nom de votre société (optionnel)",
     message: "Message*",
     messagePlaceholder:
       "Décrivez brièvement votre projet, vos objectifs ou vos questions…",
@@ -48,10 +51,13 @@ const copy = {
     subtitle:
       "Have a question, an IT project, or payroll portage needs? Our local Luxembourg experts reply within 24 business hours.",
     name: "Last name*",
+    namePlaceholder: "Smith",
     surname: "First name*",
+    surnamePlaceholder: "John",
     phone: "Phone number*",
     mail: "E-mail*",
     companyname: "Company name",
+    companyPlaceholder: "Your company name (optional)",
     message: "Message*",
     messagePlaceholder:
       "Briefly describe your project, timeline, or requirements…",
@@ -359,7 +365,7 @@ export function ContactSection({ locale }: ContactSectionProps) {
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Dupont"
+                        placeholder={t.namePlaceholder}
                         className="mt-1.5 w-full rounded-[4px] border border-brand/20 bg-white px-3.5 py-2.5 text-[15px] text-brand-navy placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                       />
                     </div>
@@ -377,7 +383,7 @@ export function ContactSection({ locale }: ContactSectionProps) {
                         required
                         value={surname}
                         onChange={(e) => setSurname(e.target.value)}
-                        placeholder="Jean"
+                        placeholder={t.surnamePlaceholder}
                         className="mt-1.5 w-full rounded-[4px] border border-brand/20 bg-white px-3.5 py-2.5 text-[15px] text-brand-navy placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                       />
                     </div>
@@ -433,7 +439,7 @@ export function ContactSection({ locale }: ContactSectionProps) {
                       type="text"
                       value={companyname}
                       onChange={(e) => setCompanyname(e.target.value)}
-                      placeholder="Nom de votre société (optionnel)"
+                      placeholder={t.companyPlaceholder}
                       className="mt-1.5 w-full rounded-[4px] border border-brand/20 bg-white px-3.5 py-2.5 text-[15px] text-brand-navy placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
                     />
                   </div>
