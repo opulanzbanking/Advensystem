@@ -1,1 +1,2 @@
-﻿Date,Nom,Prénom,Email,Téléphone,Société,Langue,Source,Message
+﻿Date,Nom,Prénom,Email,Téléphone,Société,Langue,Source,Message,Statut_Email
+"2026-11-03T12:04:37.793Z","Jean","Dupont","contact@advensystem.lu","+352 661 11 22 60","AdvenSystem Client Test","FR","End-to-End SMTP Verification","Bonjour, ceci est un test de soumission du formulaire de contact avec livraison SMTP active.","Sent via SMTP (<34f2599b-de22-98c1-312a-71fd082b6e60@advensystem.lu>)"

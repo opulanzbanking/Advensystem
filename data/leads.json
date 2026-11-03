@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "id": "lead_1793707477793_fsyo04",
+    "createdAt": "2026-11-03T12:04:37.793Z",
+    "name": "Jean",
+    "surname": "Dupont",
+    "phone": "+352 661 11 22 60",
+    "mail": "contact@advensystem.lu",
+    "companyname": "AdvenSystem Client Test",
+    "msg": "Bonjour, ceci est un test de soumission du formulaire de contact avec livraison SMTP active.",
+    "locale": "fr",
+    "source": "End-to-End SMTP Verification",
+    "ip": "unknown",
+    "emailSent": true,
+    "emailStatusText": "Sent via SMTP (<34f2599b-de22-98c1-312a-71fd082b6e60@advensystem.lu>)",
+    "storageTarget": "memory",
+    "emailProvider": "smtp",
+    "emailMessageId": "<34f2599b-de22-98c1-312a-71fd082b6e60@advensystem.lu>"
+  }
+]

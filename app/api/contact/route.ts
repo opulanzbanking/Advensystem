@@ -264,7 +264,7 @@ export async function POST(request: Request) {
 
     if (!emailDelivered && host && user && pass) {
       console.log(
-        `[contact] 📤 [SMTP] Falling back to Option 2 (SMTP: ${host}:${port}) to ${to}...`,
+        `[contact] 📤 [SMTP] Sending email notification via ${host}:${port} to ${to}...`,
       );
       try {
         const transporter = nodemailer.createTransport({
