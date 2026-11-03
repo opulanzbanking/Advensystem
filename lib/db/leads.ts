@@ -15,8 +15,19 @@ export interface StoredLead {
   source: string;
   ip: string;
   emailSent: boolean;
+  emailProvider?: "resend" | "smtp" | "web3forms" | "none";
+  emailStatusText?: string;
   emailError?: string;
+  emailMessageId?: string;
   storageTarget?: "primary" | "fallback" | "memory";
+}
+
+export interface EmailStatusUpdate {
+  sent: boolean;
+  provider?: "resend" | "smtp" | "web3forms" | "none";
+  statusText: string;
+  error?: string;
+  messageId?: string;
 }
 
 // In-memory cache ensures no lead is ever lost even if filesystem is read-only (e.g. Vercel)
@@ -49,6 +60,7 @@ function escapeCsvCell(val: string): string {
 }
 
 function buildCsvRow(lead: StoredLead): string {
+  const emailStatus = lead.emailStatusText || (lead.emailSent ? "Email Sent" : "Pending / Not Configured");
   return (
     [
       escapeCsvCell(lead.createdAt),
@@ -60,11 +72,13 @@ function buildCsvRow(lead: StoredLead): string {
       escapeCsvCell(lead.locale.toUpperCase()),
       escapeCsvCell(lead.source),
       escapeCsvCell(lead.msg.replace(/[\r\n]+/g, " ")),
+      escapeCsvCell(emailStatus),
     ].join(",") + "\n"
   );
 }
 
-const CSV_HEADER = "\uFEFFDate,Nom,Prénom,Email,Téléphone,Société,Langue,Source,Message\n";
+const CSV_HEADER =
+  "\uFEFFDate,Nom,Prénom,Email,Téléphone,Société,Langue,Source,Message,Statut_Email\n";
 
 export async function saveLead(
   leadData: Omit<StoredLead, "id" | "createdAt">,
@@ -76,6 +90,7 @@ export async function saveLead(
     id,
     createdAt,
     ...leadData,
+    emailStatusText: leadData.emailStatusText || "Processing...",
     storageTarget: "memory",
   };
 
@@ -152,40 +167,73 @@ export async function saveLead(
 
 export function updateLeadEmailStatus(
   id: string,
-  sent: boolean,
-  error?: string,
+  update: EmailStatusUpdate | boolean,
+  legacyError?: string,
 ) {
-  // Update memory
+  const normUpdate: EmailStatusUpdate =
+    typeof update === "boolean"
+      ? {
+          sent: update,
+          statusText: update ? "Email Sent" : legacyError || "Failed",
+          error: legacyError,
+        }
+      : update;
+
+  // 1. Update memory
   const mem = memoryLeads.find((l) => l.id === id);
   if (mem) {
-    mem.emailSent = sent;
-    if (error) mem.emailError = error;
+    mem.emailSent = normUpdate.sent;
+    mem.emailProvider = normUpdate.provider;
+    mem.emailStatusText = normUpdate.statusText;
+    mem.emailError = normUpdate.error;
+    mem.emailMessageId = normUpdate.messageId;
   }
 
-  // Update primary if possible
+  // Helper to re-write CSV from leads array
+  function rewriteCsvFile(filePath: string, leads: StoredLead[]) {
+    try {
+      let csv = CSV_HEADER;
+      for (const l of leads) {
+        csv += buildCsvRow(l);
+      }
+      fs.writeFileSync(filePath, csv, "utf8");
+    } catch {
+      // Ignore write errors on CSV update
+    }
+  }
+
+  // 2. Update primary files if possible
   try {
     if (fs.existsSync(PRIMARY_JSON)) {
       const all: StoredLead[] = JSON.parse(fs.readFileSync(PRIMARY_JSON, "utf8"));
       const target = all.find((l) => l.id === id);
       if (target) {
-        target.emailSent = sent;
-        if (error) target.emailError = error;
+        target.emailSent = normUpdate.sent;
+        target.emailProvider = normUpdate.provider;
+        target.emailStatusText = normUpdate.statusText;
+        target.emailError = normUpdate.error;
+        target.emailMessageId = normUpdate.messageId;
         fs.writeFileSync(PRIMARY_JSON, JSON.stringify(all, null, 2), "utf8");
+        rewriteCsvFile(PRIMARY_CSV, all);
       }
     }
   } catch {
     // Ignore lock errors on status update
   }
 
-  // Update fallback if possible
+  // 3. Update fallback files if possible
   try {
     if (fs.existsSync(FALLBACK_JSON)) {
       const all: StoredLead[] = JSON.parse(fs.readFileSync(FALLBACK_JSON, "utf8"));
       const target = all.find((l) => l.id === id);
       if (target) {
-        target.emailSent = sent;
-        if (error) target.emailError = error;
+        target.emailSent = normUpdate.sent;
+        target.emailProvider = normUpdate.provider;
+        target.emailStatusText = normUpdate.statusText;
+        target.emailError = normUpdate.error;
+        target.emailMessageId = normUpdate.messageId;
         fs.writeFileSync(FALLBACK_JSON, JSON.stringify(all, null, 2), "utf8");
+        rewriteCsvFile(FALLBACK_CSV, all);
       }
     }
   } catch {
@@ -235,27 +283,18 @@ export function getAllLeads(): StoredLead[] {
 }
 
 export function getLeadsCsv(): string | null {
-  // If primary CSV exists and is readable, return it
-  try {
-    if (fs.existsSync(PRIMARY_CSV)) {
-      return fs.readFileSync(PRIMARY_CSV, "utf8");
-    }
-  } catch {
-    // Ignore
-  }
-
-  // Try fallback CSV
-  try {
-    if (fs.existsSync(FALLBACK_CSV)) {
-      return fs.readFileSync(FALLBACK_CSV, "utf8");
-    }
-  } catch {
-    // Ignore
-  }
-
-  // Reconstruct from all stored leads in memory
+  // Reconstruct dynamically from all stored leads to ensure latest email status is included
   const all = getAllLeads();
-  if (all.length === 0) return null;
+  if (all.length === 0) {
+    // If files exist directly on disk, try reading them
+    try {
+      if (fs.existsSync(PRIMARY_CSV)) return fs.readFileSync(PRIMARY_CSV, "utf8");
+      if (fs.existsSync(FALLBACK_CSV)) return fs.readFileSync(FALLBACK_CSV, "utf8");
+    } catch {
+      // Ignore
+    }
+    return null;
+  }
 
   let csv = CSV_HEADER;
   for (const lead of all) {

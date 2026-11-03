@@ -151,51 +151,121 @@ export async function POST(request: Request) {
       emailSent: false,
     });
 
-    // 2. If SMTP is configured, send the notification email
+    console.log(
+      `[contact] 📋 [NEW INQUIRY SAVED] ID: ${stored.id} | From: ${name} ${surname} (${mail}, ${phone}) | Storage: ${stored.storageTarget}`,
+    );
+
+    // 2. Prepare email content
+    const to = process.env.CONTACT_TO || "contact@advensystem.lu";
+    const subject =
+      locale === "en"
+        ? `Website lead – ${singleLine(name)} ${singleLine(surname)}`
+        : `Nouveau contact site web – ${singleLine(name)} ${singleLine(surname)}`;
+
+    const text = [
+      `Nom: ${name} ${surname}`,
+      `E-mail: ${mail}`,
+      `Téléphone: ${phone}`,
+      `Société: ${companyname || "—"}`,
+      `Langue: ${locale.toUpperCase()}`,
+      `Source: ${source}`,
+      `ID Lead: ${stored.id}`,
+      "",
+      "Message:",
+      msg,
+    ].join("\n");
+
+    const html = `
+      <h2 style="font-family:Arial,sans-serif;color:#00226E;margin:0 0 16px">Nouveau contact reçu depuis le site</h2>
+      <table style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;border-collapse:collapse">
+        <tr><td style="padding:4px 12px 4px 0"><strong>Nom</strong></td><td>${escapeHtml(name)} ${escapeHtml(surname)}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>E-mail</strong></td><td><a href="mailto:${escapeHtml(mail)}">${escapeHtml(mail)}</a></td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Téléphone</strong></td><td><a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Société</strong></td><td>${escapeHtml(companyname || "—")}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Langue</strong></td><td>${escapeHtml(locale.toUpperCase())}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>Source</strong></td><td>${escapeHtml(source)}</td></tr>
+        <tr><td style="padding:4px 12px 4px 0"><strong>ID Suivi</strong></td><td><code>${escapeHtml(stored.id)}</code></td></tr>
+      </table>
+      <div style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;margin-top:20px;padding:12px;background:#f5f7fc;border-left:4px solid #003ABD">
+        <strong>Message :</strong>
+        <p style="white-space:pre-wrap;margin-top:8px">${escapeHtml(msg)}</p>
+      </div>
+    `;
+
+    let emailDelivered = false;
+    let emailProvider: "resend" | "smtp" | "none" = "none";
+    let emailStatusText = "Pending / Not Configured";
+    let emailMessageId: string | undefined;
+
+    // --- OPTION 1: Resend (Primary) ---
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const resendFrom = process.env.RESEND_FROM || "AdvenSystem <onboarding@resend.dev>";
+
+    if (resendApiKey) {
+      console.log(
+        `[contact] 📤 [RESEND] Sending email notification to ${to} (from: ${resendFrom})...`,
+      );
+      try {
+        const resendRes = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${resendApiKey.trim()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: resendFrom,
+            to: [to],
+            reply_to: mail,
+            subject,
+            text,
+            html,
+          }),
+        });
+
+        if (resendRes.ok) {
+          const resData = (await resendRes.json().catch(() => ({}))) as {
+            id?: string;
+          };
+          emailDelivered = true;
+          emailProvider = "resend";
+          emailMessageId = resData.id;
+          emailStatusText = `Sent via Resend (${resData.id || "ok"})`;
+
+          console.log(
+            `[contact] ✅ [RESEND SUCCESS] Email delivered to ${to}! Message ID: ${resData.id || "N/A"}`,
+          );
+
+          updateLeadEmailStatus(stored.id, {
+            sent: true,
+            provider: "resend",
+            statusText: emailStatusText,
+            messageId: resData.id,
+          });
+        } else {
+          const errText = await resendRes.text();
+          console.error(
+            `[contact] ❌ [RESEND FAILED] API returned status ${resendRes.status}: ${errText}`,
+          );
+          emailStatusText = `Resend Failed (${resendRes.status})`;
+        }
+      } catch (resendErr) {
+        console.error("[contact] ❌ [RESEND EXCEPTION]", resendErr);
+        emailStatusText = `Resend Exception: ${resendErr instanceof Error ? resendErr.message : String(resendErr)}`;
+      }
+    }
+
+    // --- OPTION 2: SMTP (Fallback if Resend is not set or failed) ---
     const host = process.env.SMTP_HOST;
     const user = process.env.SMTP_USER;
     const pass = process.env.SMTP_PASS;
     const port = Number(process.env.SMTP_PORT || 587);
-    const secure = process.env.SMTP_SECURE === "true";
-    const from = process.env.SMTP_FROM || user;
-    const to = process.env.CONTACT_TO || "contact@advensystem.lu";
+    const secure = process.env.SMTP_SECURE === "true" || port === 465;
+    const from = process.env.SMTP_FROM || user || "contact@advensystem.lu";
 
-    if (host && user && pass && from) {
-      const subject =
-        locale === "en"
-          ? `Website lead – ${singleLine(name)} ${singleLine(surname)}`
-          : `Nouveau contact site web – ${singleLine(name)} ${singleLine(surname)}`;
-
-      const text = [
-        `Nom: ${name} ${surname}`,
-        `E-mail: ${mail}`,
-        `Téléphone: ${phone}`,
-        `Société: ${companyname || "—"}`,
-        `Langue: ${locale.toUpperCase()}`,
-        `Source: ${source}`,
-        `ID Lead: ${stored.id}`,
-        "",
-        "Message:",
-        msg,
-      ].join("\n");
-
-      const html = `
-        <h2 style="font-family:Arial,sans-serif;color:#00226E;margin:0 0 16px">Nouveau contact reçu depuis le site</h2>
-        <table style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;border-collapse:collapse">
-          <tr><td style="padding:4px 12px 4px 0"><strong>Nom</strong></td><td>${escapeHtml(name)} ${escapeHtml(surname)}</td></tr>
-          <tr><td style="padding:4px 12px 4px 0"><strong>E-mail</strong></td><td><a href="mailto:${escapeHtml(mail)}">${escapeHtml(mail)}</a></td></tr>
-          <tr><td style="padding:4px 12px 4px 0"><strong>Téléphone</strong></td><td><a href="tel:${escapeHtml(phone)}">${escapeHtml(phone)}</a></td></tr>
-          <tr><td style="padding:4px 12px 4px 0"><strong>Société</strong></td><td>${escapeHtml(companyname || "—")}</td></tr>
-          <tr><td style="padding:4px 12px 4px 0"><strong>Langue</strong></td><td>${escapeHtml(locale.toUpperCase())}</td></tr>
-          <tr><td style="padding:4px 12px 4px 0"><strong>Source</strong></td><td>${escapeHtml(source)}</td></tr>
-          <tr><td style="padding:4px 12px 4px 0"><strong>ID Suivi</strong></td><td><code>${escapeHtml(stored.id)}</code></td></tr>
-        </table>
-        <div style="font-family:Arial,sans-serif;font-size:14px;color:#0B2349;margin-top:20px;padding:12px;background:#f5f7fc;border-left:4px solid #003ABD">
-          <strong>Message :</strong>
-          <p style="white-space:pre-wrap;margin-top:8px">${escapeHtml(msg)}</p>
-        </div>
-      `;
-
+    if (!emailDelivered && host && user && pass) {
+      console.log(
+        `[contact] 📤 [SMTP] Falling back to Option 2 (SMTP: ${host}:${port}) to ${to}...`,
+      );
       try {
         const transporter = nodemailer.createTransport({
           host,
@@ -204,7 +274,7 @@ export async function POST(request: Request) {
           auth: { user, pass },
         });
 
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
           from,
           to,
           replyTo: mail,
@@ -213,24 +283,54 @@ export async function POST(request: Request) {
           html,
         });
 
-        updateLeadEmailStatus(stored.id, true);
-      } catch (error) {
-        console.error("[contact] Failed to deliver notification email (lead is safely saved)", error);
-        updateLeadEmailStatus(
-          stored.id,
-          false,
-          error instanceof Error ? error.message : String(error),
+        emailDelivered = true;
+        emailProvider = "smtp";
+        emailMessageId = info.messageId;
+        emailStatusText = `Sent via SMTP (${info.messageId || "ok"})`;
+
+        console.log(
+          `[contact] ✅ [SMTP SUCCESS] Email delivered to ${to}! Message ID: ${info.messageId || "N/A"}`,
         );
+
+        updateLeadEmailStatus(stored.id, {
+          sent: true,
+          provider: "smtp",
+          statusText: emailStatusText,
+          messageId: info.messageId,
+        });
+      } catch (smtpErr) {
+        console.error("[contact] ❌ [SMTP FAILED]", smtpErr);
+        emailStatusText = `SMTP Failed: ${smtpErr instanceof Error ? smtpErr.message : String(smtpErr)}`;
+        updateLeadEmailStatus(stored.id, {
+          sent: false,
+          provider: "smtp",
+          statusText: emailStatusText,
+          error: smtpErr instanceof Error ? smtpErr.message : String(smtpErr),
+        });
       }
-    } else {
-      console.info(
-        `[contact] SMTP not configured. Lead ${stored.id} safely stored in database (target: ${stored.storageTarget}).`,
-      );
+    }
+
+    if (!emailDelivered) {
+      if (!resendApiKey && !(host && user && pass)) {
+        console.warn(
+          `[contact] ⚠️ [EMAIL NOT CONFIGURED] Neither RESEND_API_KEY nor SMTP credentials found in environment. Lead ${stored.id} is safely stored in leads.csv and leads.json.`,
+        );
+        emailStatusText = "Pending (No email credentials set in env)";
+        updateLeadEmailStatus(stored.id, {
+          sent: false,
+          provider: "none",
+          statusText: emailStatusText,
+        });
+      }
     }
 
     return NextResponse.json({
       ok: true,
       id: stored.id,
+      emailDelivered,
+      emailProvider,
+      emailStatus: emailStatusText,
+      emailMessageId,
       message:
         locale === "en"
           ? "The request was sent successfully. We will contact you soon, thank you!"
